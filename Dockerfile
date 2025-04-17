@@ -7,9 +7,12 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Step 2: Serve using Nginx
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Step 2: Serve the app using Nginx (or directly on port 3000 for development)
+FROM node:18 AS serve
+WORKDIR /app
+COPY --from=build /app /app
+
+# Expose port 3000 for the React app in development
+EXPOSE 3000
+CMD ["npm", "start"]
 
