@@ -1,18 +1,21 @@
-# Step 1: Build the React app
-FROM node:18 AS build
+# Use official Node.js image
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
+
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
+
+# Copy the rest of the app
 COPY . .
-RUN npm run build
 
-# Step 2: Serve the app using Nginx (or directly on port 3000 for development)
-FROM node:18 AS serve
-WORKDIR /app
-COPY --from=build /app /app
-
-# Expose port 3000 for the React app in development
+# Expose default React port
 EXPOSE 3000
+
+# Start the development server
 CMD ["npm", "start"]
 
