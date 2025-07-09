@@ -1,5 +1,5 @@
-# Use official Node.js image
-FROM node:18-alpine
+# Stage 1: Build React App
+FROM node:18-alpine as build
 
 # Set working directory
 WORKDIR /app
@@ -13,9 +13,21 @@ RUN npm install
 # Copy the rest of the app
 COPY . .
 
-# Expose default React port
-EXPOSE 3000
+# Build the React app
+RUN npm run build
 
-# Start the development server
-CMD ["npm", "start"]
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
+
+# Copy the build files from the previous stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy custom nginx config if needed (optional)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
 
